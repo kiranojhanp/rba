@@ -18,7 +18,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.get("/", async (req, res) => {
-    res.send("Hello world!")
+    res.send("Hello World")
 })
 
 app.use("/auth", AuthRoute)

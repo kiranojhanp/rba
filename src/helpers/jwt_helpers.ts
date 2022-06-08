@@ -48,7 +48,9 @@ const signRefreshToken = (userId: string, role: string): Promise<string> => {
 
             try {
                 // add new refresh token to redis list
-                const saveResult = await client.rPush(`refreshTokens-${userId}`, [token as string])
+                const addOneYearToToday = new Date().setFullYear(new Date().getFullYear() + 1)
+                const tokenData = { token: token, expiresAt: addOneYearToToday }
+                const saveResult = await client.rPush(`refreshTokens-${userId}`, JSON.stringify(tokenData))
 
                 if (saveResult) return resolve(token as string)
             } catch (err) {
@@ -71,13 +73,20 @@ const verifyRefreshToken = (refreshToken: string): Promise<{ userId: string; rol
 
             try {
                 const getRefreshTokenFromList = await client.lRange(`refreshTokens-${userId}`, 0, -1)
-                getRefreshTokenFromList.forEach((token) => {
-                    if (token === refreshToken) {
+                let expiresAt = 0
+
+                for (const token of getRefreshTokenFromList) {
+                    const parsedToken = JSON.parse(token)
+                    if (parsedToken.token === refreshToken) {
+                        expiresAt = parsedToken.expiresAt
                         return resolve({ userId, role })
                     }
-                })
+                }
 
-                await client.lRem(`refreshTokens-${userId}`, 0, refreshToken)
+                if (expiresAt !== 0) {
+                    await client.lRem(`refreshTokens-${userId}`, 0, JSON.stringify({ token: refreshToken, expiresAt }))
+                }
+
                 reject(new createError.Unauthorized())
             } catch (err) {
                 console.log(err.message)
