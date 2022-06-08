@@ -6,6 +6,6 @@ const router = Router()
 
 router.post("/register", register)
 router.post("/login", login)
-router.post("/admin", verifyAuthentication, verifyAuthorization(["admin"]), admin)
+router.post("/admin", verifyAuthentication, verifyAuthorization(["admin", "super-admin"]), admin)
 
 export default router
