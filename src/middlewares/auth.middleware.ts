@@ -20,14 +20,9 @@ const verifyAuthentication = (req: Request, res: Response, next: NextFunction) =
 }
 
 const verifyAuthorization = (allowedRoles: roles[]) => (req: Request, res: Response, next: NextFunction) => {
-    let allowed = false
-    allowedRoles.forEach((role) => {
-        if (req?.payload?.role === role) {
-            allowed = true
-        }
-    })
-
-    if (!allowed) return new createError.Unauthorized("You don't have enough priviledge to view this resource.")
+    if (!allowedRoles.includes(req?.payload?.role)) {
+        return next(new createError.Unauthorized("You don't have enough priviledge to view this resource."))
+    }
     next()
 }
 

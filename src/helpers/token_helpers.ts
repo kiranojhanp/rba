@@ -7,7 +7,9 @@ const issued_by = "www.ghurghura.com"
 
 const signAccessToken = (userId: string, role: string): Promise<string> => {
     return new Promise((resolve, reject) => {
-        const payload = {}
+        const payload = {
+            role: role,
+        }
         const secret = ACCESS_TOKEN_SECRET
 
         const options = {
@@ -29,7 +31,9 @@ const signAccessToken = (userId: string, role: string): Promise<string> => {
 
 const signRefreshToken = (userId: string, role: string): Promise<string> => {
     return new Promise((resolve, reject) => {
-        const payload = {}
+        const payload = {
+            role: role,
+        }
         const secret = REFRESH_TOKEN_SECRET
         const options = {
             expiresIn: "1y",
