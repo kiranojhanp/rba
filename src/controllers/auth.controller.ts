@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import createError from "http-errors"
-import { signAccessToken, signRefreshToken } from "../helpers/jwt_helpers"
+import client from "../helpers/init_redis"
+import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../helpers/jwt_helpers"
 import User from "../models/user.model"
 
 // @desc get admin profile , @route POST /auth/admin, @access Private/Admin
@@ -61,4 +62,27 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-export { admin, register, login }
+// @desc generate new access token , @route POST /auth/refresh-token, @access Private
+const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { refreshToken } = req.body
+        if (!refreshToken) throw new createError.BadRequest()
+
+        const { userId, role } = await verifyRefreshToken(refreshToken)
+        // remove refresh token from list
+        // allow one refresh token to sign access token only once
+        await client.lRem(`refreshTokens-${userId}`, 0, refreshToken)
+
+        const accessToken = await signAccessToken(userId, role)
+        const refToken = await signRefreshToken(userId, role)
+
+        res.send({
+            accessToken: accessToken,
+            refreshToken: refToken,
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+export { admin, register, login, refreshToken }

@@ -7,9 +7,7 @@ const issued_by = "www.ghurghura.com"
 
 const signAccessToken = (userId: string, role: string): Promise<string> => {
     return new Promise((resolve, reject) => {
-        const payload = {
-            role: role,
-        }
+        const payload = { role: role }
         const secret = ACCESS_TOKEN_SECRET
 
         const options = {
@@ -41,10 +39,7 @@ const signRefreshToken = (userId: string, role: string): Promise<string> => {
             audience: userId,
         }
         JWT.sign(payload, secret, options, async (err, token) => {
-            if (err) {
-                console.log(err.message)
-                reject(new createError.InternalServerError())
-            }
+            if (err) return reject(new createError.InternalServerError())
 
             try {
                 // add new refresh token to redis list
@@ -64,9 +59,7 @@ const signRefreshToken = (userId: string, role: string): Promise<string> => {
 const verifyRefreshToken = (refreshToken: string): Promise<{ userId: string; role: string }> => {
     return new Promise((resolve, reject) => {
         JWT.verify(refreshToken, REFRESH_TOKEN_SECRET, async (err, payload: any) => {
-            if (err) {
-                return reject(new createError.Unauthorized())
-            }
+            if (err) return reject(new createError.Unauthorized())
 
             const userId = payload.aud
             const role = payload.role
