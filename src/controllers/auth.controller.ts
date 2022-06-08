@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import createError from "http-errors"
-import { signAccessToken, signRefreshToken } from "../helpers/token_helpers"
+import { signAccessToken, signRefreshToken } from "../helpers/jwt_helpers"
 import User from "../models/user.model"
 
 // @desc get admin profile , @route POST /auth/admin, @access Private/Admin

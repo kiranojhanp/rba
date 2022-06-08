@@ -1,6 +1,6 @@
 import createError from "http-errors"
 import JWT from "jsonwebtoken"
-import { client } from "../helpers/init_redis"
+import { client } from "./init_redis"
 
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env as { [key: string]: string }
 const issued_by = "www.ghurghura.com"
