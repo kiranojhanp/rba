@@ -25,6 +25,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
         const user = new User(result)
         const savedUser = await user.save()
         const { id, role } = savedUser
+
         const accessToken = await signAccessToken(id, role)
         const refreshToken = await signRefreshToken(id, role)
 
@@ -41,13 +42,13 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
         const result = req.body
 
         // check if user exists
-        const { email } = result
+        const { email, password } = result
         const doesExist = await User.findOne({ email })
         if (!doesExist) throw new createError.NotFound("User not registered")
 
         // verify password and return access + refresh tokens
-        const { id, role, isValidPassword } = doesExist
-        const isMatch = await isValidPassword(result.password)
+        const { id, role } = doesExist
+        const isMatch = await doesExist.isValidPassword(password)
         if (!isMatch) throw new createError.Unauthorized("Username/password not valid")
 
         const accessToken = await signAccessToken(id, role)

@@ -9,11 +9,11 @@ const signAccessToken = (userId: string, role: string): Promise<string> => {
     return new Promise((resolve, reject) => {
         const payload = {}
         const secret = ACCESS_TOKEN_SECRET
+
         const options = {
             expiresIn: "1h",
             issuer: issued_by,
             audience: userId,
-            role: role,
         }
 
         JWT.sign(payload, secret, options, (err, token) => {
@@ -35,7 +35,6 @@ const signRefreshToken = (userId: string, role: string): Promise<string> => {
             expiresIn: "1y",
             issuer: issued_by,
             audience: userId,
-            role: role,
         }
         JWT.sign(payload, secret, options, async (err, token) => {
             if (err) {
