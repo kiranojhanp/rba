@@ -1,5 +1,4 @@
-import { config } from "dotenv"
-config()
+require("./helpers/init_config")
 import http from "http"
 import app from "./app"
 

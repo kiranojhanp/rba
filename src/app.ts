@@ -4,9 +4,8 @@ import helmet from "helmet"
 import createError from "http-errors"
 import morgan from "morgan"
 import responseTime from "response-time"
-import { HASH_ASYNC, HASH_COMPARE_ASYNC } from "./helpers/hash_password"
-
-require("./helpers/init_db")
+import "./helpers/init_db"
+import AuthRoute from "./routes/auth.route"
 
 const app: Application = express()
 
@@ -19,15 +18,10 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.get("/", async (req, res) => {
-    res.send("Hello world!, This is updated using CI/CD")
+    res.send("Hello world!")
 })
 
-app.post("/", async (req, res) => {
-    const { password } = req.body
-    const hash = await HASH_ASYNC(password)
-    const isVerified = await HASH_COMPARE_ASYNC(hash, password)
-    res.send({ hash, isVerified })
-})
+app.use("/auth", AuthRoute)
 
 // error handlers
 app.use(async (req, res, next) => {
