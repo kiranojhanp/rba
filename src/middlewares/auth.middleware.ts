@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import createError from "http-errors"
 import JWT from "jsonwebtoken"
+import { checkIfExists } from "../helpers/utility_functions"
 import { roles } from "../types/roles"
 const { ACCESS_TOKEN_SECRET } = process.env as { [key: string]: string }
 
@@ -20,10 +21,11 @@ const verifyAuthentication = (req: Request, res: Response, next: NextFunction) =
 }
 
 const verifyAuthorization = (allowedRoles: roles[]) => (req: Request, res: Response, next: NextFunction) => {
-    if (!allowedRoles.includes(req?.payload?.role)) {
-        return next(new createError.Unauthorized("You don't have enough priviledge to view this resource."))
-    }
-    next()
+    checkIfExists(allowedRoles, req?.payload?.role)
+        .then(() => {
+            next()
+        })
+        .catch(() => next(new createError.Unauthorized("You don't have enough priviledge to view this resource.")))
 }
 
 export { verifyAuthentication, verifyAuthorization }
